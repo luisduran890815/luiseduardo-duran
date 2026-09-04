@@ -1,12 +1,6 @@
 {
   "photo_posts": [
     {
-      "title": "Proyectos e infraestructura",
-      "date": "2026-09-04",
-      "image": "/assets/img/photo-placeholder.svg",
-      "caption": "Este espacio está preparado para compartir fotografías de proyectos, aprendizajes y experiencias profesionales."
-    },
-    {
       "image": "/assets/img/uploads/cambio-de-chiller-genoves.jpeg",
       "title": "Adecuaciones previas Cambio de Chiller Genoves",
       "date": "2026-08-31",
@@ -19,6 +13,12 @@
       "date": "2026-09-04",
       "excerpt": "Un espacio para compartir ideas sobre infraestructura, mantenimiento, proyectos, tecnología y mejora continua.",
       "body": "Aquí publicaré análisis, experiencias y aprendizajes que puedan aportar valor a profesionales y organizaciones."
+    },
+    {
+      "title": "Lo que he aprendido gestionando infraestructura: la diferencia entre reparar problemas y construir continuidad",
+      "date": "2026-09-04",
+      "excerpt": "La experiencia me ha enseñado que el verdadero valor de la infraestructura no está en resolver emergencias, sino en construir organizaciones más resilientes, eficientes y preparadas para el futuro.",
+      "body": "A lo largo de mi trayectoria profesional he tenido la oportunidad de trabajar en sectores tan diversos como salud, seguros, manufactura, energía y servicios. Aunque los contextos cambian, existe algo que permanece constante: la infraestructura es el soporte silencioso sobre el que descansan las operaciones de cualquier organización.\n\nMuchas veces la gestión de infraestructura se percibe únicamente como mantenimiento de equipos o administración de instalaciones. Sin embargo, detrás de cada oficina, planta de producción, centro de atención o edificio corporativo existe una compleja red de decisiones relacionadas con presupuesto, riesgos, continuidad operativa, seguridad, contratistas y gestión de activos.\n\nUno de los aprendizajes más importantes que he adquirido es que las organizaciones más eficientes no son aquellas que reaccionan más rápido ante las emergencias, sino aquellas que logran prevenirlas mediante planificación y control. Cada proyecto ejecutado, cada adecuación realizada y cada activo gestionado representan una oportunidad para reducir riesgos futuros y mejorar la sostenibilidad del negocio.\n\nTambién he comprobado que la tecnología, por sí sola, no resuelve los desafíos. Herramientas como SAP, Power BI y los sistemas de gestión aportan información valiosa, pero el verdadero diferencial está en la capacidad de interpretar los datos y convertirlos en decisiones que generen resultados tangibles para la organización.\n\nLa coordinación entre equipos, proveedores, contratistas y áreas usuarias es otro factor determinante. Los proyectos exitosos rara vez dependen de una sola persona. Surgen cuando existe una visión compartida, una comunicación clara y una gestión adecuada de los recursos disponibles.\n\nEn los últimos años he participado en proyectos de infraestructura corporativa, adecuaciones locativas, renovación tecnológica, mantenimiento y gestión de activos. Cada experiencia ha reforzado una convicción: los activos físicos no son simplemente instalaciones o equipos; son herramientas estratégicas que permiten que las personas desarrollen su trabajo y que las organizaciones alcancen sus objetivos.\n\nMirando hacia el futuro, considero que la gestión de infraestructura seguirá evolucionando hacia modelos cada vez más apoyados en analítica, sostenibilidad, automatización y toma de decisiones basada en datos. En ese escenario, los profesionales que logren combinar conocimiento técnico, visión financiera y liderazgo tendrán la capacidad de generar un impacto significativo dentro de sus organizaciones.\n\nMás allá de los proyectos y los indicadores, la mayor satisfacción de esta profesión consiste en saber que detrás de cada oficina operativa, cada sede funcional y cada activo disponible existe un trabajo de planificación, gestión y mejora continua que permite que el negocio siga avanzando."
     }
   ],
   "videos": [
