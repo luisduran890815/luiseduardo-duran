@@ -1,0 +1,26 @@
+{
+  "photo_posts": [
+    {
+      "title": "Proyectos e infraestructura",
+      "date": "2026-09-04",
+      "image": "/assets/img/photo-placeholder.svg",
+      "caption": "Este espacio está preparado para compartir fotografías de proyectos, aprendizajes y experiencias profesionales."
+    }
+  ],
+  "text_posts": [
+    {
+      "title": "Bienvenido a mi blog",
+      "date": "2026-09-04",
+      "excerpt": "Un espacio para compartir ideas sobre infraestructura, mantenimiento, proyectos, tecnología y mejora continua.",
+      "body": "Aquí publicaré análisis, experiencias y aprendizajes que puedan aportar valor a profesionales y organizaciones."
+    }
+  ],
+  "videos": [
+    {
+      "title": "Presentación profesional",
+      "date": "2026-09-04",
+      "youtube_url": "",
+      "description": "Añade desde el panel de administración la URL de un vídeo de YouTube."
+    }
+  ]
+}

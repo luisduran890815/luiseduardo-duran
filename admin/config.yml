@@ -1,0 +1,40 @@
+backend:
+  name: git-gateway
+  branch: main
+media_folder: "assets/img/uploads"
+public_folder: "/assets/img/uploads"
+publish_mode: simple
+locale: es
+collections:
+  - name: "contenido"
+    label: "Contenido del sitio"
+    files:
+      - name: "publicaciones"
+        label: "Fotos, escritos y vídeos"
+        file: "data/site.json"
+        format: "json"
+        fields:
+          - label: "Publicaciones con foto"
+            name: "photo_posts"
+            widget: "list"
+            fields:
+              - {label: "Título", name: "title", widget: "string"}
+              - {label: "Fecha", name: "date", widget: "datetime", format: "YYYY-MM-DD", time_format: false}
+              - {label: "Foto", name: "image", widget: "image"}
+              - {label: "Texto debajo de la foto", name: "caption", widget: "text"}
+          - label: "Escritos"
+            name: "text_posts"
+            widget: "list"
+            fields:
+              - {label: "Título", name: "title", widget: "string"}
+              - {label: "Fecha", name: "date", widget: "datetime", format: "YYYY-MM-DD", time_format: false}
+              - {label: "Resumen", name: "excerpt", widget: "text"}
+              - {label: "Texto", name: "body", widget: "text"}
+          - label: "Vídeos"
+            name: "videos"
+            widget: "list"
+            fields:
+              - {label: "Título", name: "title", widget: "string"}
+              - {label: "Fecha", name: "date", widget: "datetime", format: "YYYY-MM-DD", time_format: false}
+              - {label: "URL de YouTube", name: "youtube_url", widget: "string", required: false}
+              - {label: "Descripción", name: "description", widget: "text"}
