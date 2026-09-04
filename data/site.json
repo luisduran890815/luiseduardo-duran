@@ -10,11 +10,15 @@
       "title": "De la ingeniería en papel a la experiencia del usuario: renovación del sistema HVAC en la IPS SURA Génoves",
       "date": "2026-08-28",
       "caption": "Detrás de cada espacio confortable existe un trabajo de análisis, planeación y coordinación que muchas veces pasa desapercibido. Este proyecto tuvo como objetivo modernizar el sistema de climatización de la IPS SURA Genovés, mejorando las condiciones de confort para usuarios y colaboradores, garantizando eficiencia operativa y continuidad del servicio.",
-      "image": "/assets/img/uploads/ips-baq-p1-v2.jpg",
+      "image": "",
       "images": [
         {
           "image": "/assets/img/uploads/sala-espera-urgencias-genoves.jpeg",
           "alt": "Sala de Espera "
+        },
+        {
+          "image": "/assets/img/uploads/ips-baq-p1-v2.jpg",
+          "alt": "Plano de solucion desarrollado por DAIKIN"
         }
       ]
     }
