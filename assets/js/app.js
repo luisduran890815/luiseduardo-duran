@@ -1,242 +1,174 @@
-const $ = selector => document.querySelector(selector);
+const $ = (selector) => document.querySelector(selector);
 
-/* MENÚ MÓVIL */
-const menuButton = $(".menu");
-const navigation = document.querySelector("nav");
+const menuButton = $('.menu');
+const navigation = document.querySelector('nav');
 
 if (menuButton && navigation) {
-    menuButton.addEventListener("click", () => {
-        navigation.classList.toggle("open");
-    });
+  menuButton.addEventListener('click', () => navigation.classList.toggle('open'));
 }
 
-/* PROTECCIÓN DE CONTENIDO */
-const esc = value =>
-    String(value ?? "").replace(/[&<>"']/g, character => ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#39;"
-    })[character]);
+const escapeHtml = (value) =>
+  String(value ?? '').replace(/[&<>"']/g, (character) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  })[character]);
 
-/* CONSERVAR SALTOS DE LÍNEA */
-const formatText = value =>
-    esc(value).replace(/\r?\n/g, "<br>");
+const formatText = (value) => escapeHtml(value).replace(/\r?\n/g, '<br>');
 
-/* OBTENER ID DE YOUTUBE */
-const getYouTubeId = url => {
-    try {
-        const parsedUrl = new URL(url);
+const getYouTubeId = (url) => {
+  try {
+    const parsedUrl = new URL(url);
+    const hostname = parsedUrl.hostname.replace(/^www\./, '');
 
-        if (parsedUrl.hostname.includes("youtu.be")) {
-            return parsedUrl.pathname.slice(1).split("/")[0];
-        }
-
-        if (parsedUrl.searchParams.get("v")) {
-            return parsedUrl.searchParams.get("v");
-        }
-
-        const embedMatch = parsedUrl.pathname.match(/\/embed\/([^/?]+)/);
-
-        return embedMatch ? embedMatch[1] : "";
-    } catch {
-        return "";
+    if (hostname === 'youtu.be') {
+      return parsedUrl.pathname.split('/').filter(Boolean)[0] || '';
     }
+
+    if (hostname === 'youtube.com' || hostname === 'm.youtube.com' || hostname === 'youtube-nocookie.com') {
+      const queryId = parsedUrl.searchParams.get('v');
+      if (queryId) return queryId;
+
+      const pathMatch = parsedUrl.pathname.match(/^\/(?:embed|shorts|live)\/([^/?#]+)/);
+      return pathMatch ? pathMatch[1] : '';
+    }
+
+    return '';
+  } catch {
+    return '';
+  }
 };
 
-/* CARGAR CONTENIDO DEL BLOG */
-fetch("/data/site.json")
-    .then(response => {
-        if (!response.ok) {
-            throw new Error("No se pudo cargar el contenido.");
-        }
+fetch('/data/site.json')
+  .then((response) => {
+    if (!response.ok) throw new Error('No se pudo cargar /data/site.json');
+    return response.json();
+  })
+  .then((data) => {
+    const photoContainer = $('#photo-posts');
+    const textContainer = $('#text-posts');
+    const videoContainer = $('#video-posts');
 
-        return response.json();
-    })
-    .then(data => {
-        const photoContainer = $("#photo-posts");
-        const textContainer = $("#text-posts");
-        const videoContainer = $("#video-posts");
+    if (photoContainer) {
+      photoContainer.innerHTML = (data.photo_posts || []).map((post) => `
+        <article class="card">
+          <img
+            loading="lazy"
+            src="${escapeHtml(post.image)}"
+            alt="${escapeHtml(post.title)}"
+          >
+          <p class="date">${escapeHtml(post.date)}</p>
+          <h3>${escapeHtml(post.title)}</h3>
+          <p>${formatText(post.caption)}</p>
+        </article>
+      `).join('');
+    }
 
-        /* PUBLICACIONES CON FOTOS */
-        if (photoContainer) {
-            photoContainer.innerHTML = (data.photo_posts || [])
-                .map(post => `
-                    <article class="card">
-                        ${esc(post.image)}"
-                        >
+    if (textContainer) {
+      textContainer.innerHTML = (data.text_posts || []).map((post) => `
+        <article class="card">
+          <p class="date">${escapeHtml(post.date)}</p>
+          <h3>${escapeHtml(post.title)}</h3>
+          <p><strong>${formatText(post.excerpt)}</strong></p>
+          <details>
+            <summary>Leer artículo completo</summary>
+            <div class="article-content">
+              <p>${formatText(post.body)}</p>
+            </div>
+          </details>
+        </article>
+      `).join('');
+    }
 
-                        <p class="date">${esc(post.date)}</p>
+    if (videoContainer) {
+      videoContainer.innerHTML = (data.videos || []).map((post) => {
+        const videoId = getYouTubeId(post.youtube_url);
+        const description = String(post.description ?? '');
+        const preview = description.length > 180
+          ? `${description.slice(0, 180)}...`
+          : description;
 
-                        <h3>${esc(post.title)}</h3>
+        const player = videoId ? `
+          <iframe
+            loading="lazy"
+            src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(videoId)}"
+            title="${escapeHtml(post.title)}"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allowfullscreen
+          ></iframe>
+        ` : '<div class="video-placeholder">Vídeo no disponible</div>';
 
-                        <p>${formatText(post.caption)}</p>
-                    </article>
-                `)
-                .join("");
-        }
+        const expandedDescription = description.length > 180 ? `
+          <details>
+            <summary>Ver descripción completa</summary>
+            <div class="video-description">
+              <p>${formatText(description)}</p>
+            </div>
+          </details>
+        ` : '';
 
-        /* ARTÍCULOS */
-        if (textContainer) {
-            textContainer.innerHTML = (data.text_posts || [])
-                .map(post => `
-                    <article class="card">
-                        <p class="date">${esc(post.date)}</p>
+        return `
+          <article class="card video">
+            ${player}
+            <p class="date">${escapeHtml(post.date)}</p>
+            <h3>${escapeHtml(post.title)}</h3>
+            <p><strong>${formatText(preview)}</strong></p>
+            ${expandedDescription}
+          </article>
+        `;
+      }).join('');
+    }
+  })
+  .catch((error) => console.error('Error cargando las publicaciones:', error));
 
-                        <h3>${esc(post.title)}</h3>
-
-                        <p>
-                            <strong>${formatText(post.excerpt)}</strong>
-                        </p>
-
-                        <details>
-                            <summary>Leer artículo completo</summary>
-
-                            <div class="article-content">
-                                <p>${formatText(post.body)}</p>
-                            </div>
-                        </details>
-                    </article>
-                `)
-                .join("");
-        }
-
-        /* VÍDEOS */
-        if (videoContainer) {
-            videoContainer.innerHTML = (data.videos || [])
-                .map(post => {
-                    const videoId = getYouTubeId(post.youtube_url);
-                    const description = String(post.description ?? "");
-
-                    const preview =
-                        description.length > 180
-                            ? description.substring(0, 180) + "..."
-                            : description;
-
-                    const videoPlayer = videoId
-                        ? `
-                            "
-                                title="${esc(post.title)}"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                referrerpolicy="strict-origin-when-cross-origin"
-                                allowfullscreen>
-                            </iframe>
-                        `
-                        : `
-                            <div class="video-placeholder">
-                                Vídeo no disponible
-                            </div>
-                        `;
-
-                    const fullDescription = description.length > 180
-                        ? `
-                            <details>
-                                <summary>Ver descripción completa</summary>
-
-                                <div class="video-description">
-                                    <p>${formatText(description)}</p>
-                                </div>
-                            </details>
-                        `
-                        : "";
-
-                    return `
-                        <article class="card video">
-                            ${videoPlayer}
-
-                            <p class="date">${esc(post.date)}</p>
-
-                            <h3>${esc(post.title)}</h3>
-
-                            <p>
-                                <strong>${formatText(preview)}</strong>
-                            </p>
-
-                            ${fullDescription}
-                        </article>
-                    `;
-                })
-                .join("");
-        }
-    })
-    .catch(error => {
-        console.error("Error cargando las publicaciones:", error);
-    });
-
-/* FORMULARIO DE DESCARGA DEL CV */
-const cvForm = $("#cv-form");
+const cvForm = $('#cv-form');
 
 if (cvForm) {
-    cvForm.addEventListener("submit", async event => {
-        event.preventDefault();
+  cvForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
 
-        const form = event.currentTarget;
-        const status = $("#form-status");
-        const button = form.querySelector("button");
+    const form = event.currentTarget;
+    const status = $('#form-status');
+    const button = form.querySelector('button');
 
-        if (button) {
-            button.disabled = true;
-        }
+    if (button) button.disabled = true;
+    if (status) status.textContent = 'Registrando solicitud...';
 
-        if (status) {
-            status.textContent = "Registrando solicitud...";
-        }
+    try {
+      const body = new URLSearchParams(new FormData(form));
+      const response = await fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: body.toString()
+      });
 
-        try {
-            const body = new URLSearchParams(new FormData(form));
+      if (!response.ok) throw new Error('No se pudo registrar la solicitud.');
 
-            const response = await fetch("/", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
-                },
-                body: body.toString()
-            });
+      if (status) status.textContent = 'Solicitud registrada. La descarga comenzará ahora.';
+      form.reset();
 
-            if (!response.ok) {
-                throw new Error("No se pudo registrar la solicitud.");
-            }
-
-            if (status) {
-                status.textContent =
-                    "Solicitud registrada. La descarga comenzará ahora.";
-            }
-
-            form.reset();
-
-            const downloadLink = document.createElement("a");
-
-            downloadLink.href =
-                "/downloads/CV_Luis_Eduardo_Duran_Mora.pdf";
-
-            downloadLink.download =
-                "CV_Luis_Eduardo_Duran_Mora.pdf";
-
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-            downloadLink.remove();
-
-        } catch (error) {
-            console.error("Error enviando el formulario:", error);
-
-            if (status) {
-                status.textContent =
-                    "No fue posible registrar la solicitud. Inténtalo nuevamente.";
-            }
-        } finally {
-            if (button) {
-                button.disabled = false;
-            }
-        }
-    });
+      const downloadLink = document.createElement('a');
+      downloadLink.href = '/downloads/CV_Luis_Eduardo_Duran_Mora.pdf';
+      downloadLink.download = 'CV_Luis_Eduardo_Duran_Mora.pdf';
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      downloadLink.remove();
+    } catch (error) {
+      console.error('Error enviando el formulario:', error);
+      if (status) status.textContent = 'No fue posible registrar la solicitud. Inténtalo nuevamente.';
+    } finally {
+      if (button) button.disabled = false;
+    }
+  });
 }
 
-/* NETLIFY IDENTITY */
 if (window.netlifyIdentity) {
-    window.netlifyIdentity.on("init", user => {
-        if (!user && location.hash.includes("invite_token")) {
-            window.netlifyIdentity.open("signup");
-        }
-    });
+  window.netlifyIdentity.on('init', (user) => {
+    if (!user && location.hash.includes('invite_token')) {
+      window.netlifyIdentity.open('signup');
+    }
+  });
 }
