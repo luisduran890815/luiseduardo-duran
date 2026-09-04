@@ -159,3 +159,22 @@
     margin-top:4px;
     margin-bottom:10px;
 }
+
+.timeline ul{
+    margin-top:15px;
+    padding-left:20px;
+}
+
+.timeline li{
+    margin-bottom:8px;
+    line-height:1.6;
+    color:#526170;
+}
+
+.timeline p strong{
+    color:#0e2748;
+}
+
+.timeline article{
+    padding-bottom:25px;
+}
