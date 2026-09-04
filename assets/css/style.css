@@ -207,3 +207,27 @@ details[open] summary{
     line-height:1.8;
     color:#526170;
 }
+
+details{
+    margin-top:15px;
+}
+
+summary{
+    cursor:pointer;
+    font-weight:700;
+    color:#0e2748;
+    padding:10px 0;
+}
+
+summary:hover{
+    color:#bf8a2d;
+}
+
+.video-description{
+    margin-top:15px;
+}
+
+.video-description p{
+    line-height:1.8;
+    color:#526170;
+}
