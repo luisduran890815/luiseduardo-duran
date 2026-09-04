@@ -178,3 +178,32 @@
 .timeline article{
     padding-bottom:25px;
 }
+
+
+details{
+    margin-top:15px;
+}
+
+summary{
+    cursor:pointer;
+    color:#0e2748;
+    font-weight:700;
+    padding:10px 0;
+}
+
+summary:hover{
+    color:#bf8a2d;
+}
+
+details[open] summary{
+    margin-bottom:15px;
+}
+
+.article-content{
+    padding-top:10px;
+}
+
+.article-content p{
+    line-height:1.8;
+    color:#526170;
+}
