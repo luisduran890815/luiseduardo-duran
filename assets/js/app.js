@@ -1,6 +1,7 @@
 const $ = selector => document.querySelector(selector);
 
-const menuButton = document.querySelector(".menu");
+/* MENÚ MÓVIL */
+const menuButton = $(".menu");
 const navigation = document.querySelector("nav");
 
 if (menuButton && navigation) {
@@ -9,6 +10,7 @@ if (menuButton && navigation) {
     });
 }
 
+/* PROTECCIÓN DE CONTENIDO */
 const esc = value =>
     String(value ?? "").replace(/[&<>"']/g, character => ({
         "&": "&amp;",
@@ -18,22 +20,24 @@ const esc = value =>
         "'": "&#39;"
     })[character]);
 
+/* CONSERVAR SALTOS DE LÍNEA */
 const formatText = value =>
     esc(value).replace(/\r?\n/g, "<br>");
 
-const yt = url => {
+/* OBTENER ID DE YOUTUBE */
+const getYouTubeId = url => {
     try {
         const parsedUrl = new URL(url);
 
         if (parsedUrl.hostname.includes("youtu.be")) {
-            return parsedUrl.pathname.slice(1);
+            return parsedUrl.pathname.slice(1).split("/")[0];
         }
 
         if (parsedUrl.searchParams.get("v")) {
             return parsedUrl.searchParams.get("v");
         }
 
-        const embedMatch = parsedUrl.pathname.match(/\/embed\/([^/]+)/);
+        const embedMatch = parsedUrl.pathname.match(/\/embed\/([^/?]+)/);
 
         return embedMatch ? embedMatch[1] : "";
     } catch {
@@ -41,10 +45,11 @@ const yt = url => {
     }
 };
 
+/* CARGAR CONTENIDO DEL BLOG */
 fetch("/data/site.json")
     .then(response => {
         if (!response.ok) {
-            throw new Error("No se pudo cargar el contenido del sitio.");
+            throw new Error("No se pudo cargar el contenido.");
         }
 
         return response.json();
@@ -54,6 +59,7 @@ fetch("/data/site.json")
         const textContainer = $("#text-posts");
         const videoContainer = $("#video-posts");
 
+        /* PUBLICACIONES CON FOTOS */
         if (photoContainer) {
             photoContainer.innerHTML = (data.photo_posts || [])
                 .map(post => `
@@ -71,6 +77,7 @@ fetch("/data/site.json")
                 .join("");
         }
 
+        /* ARTÍCULOS */
         if (textContainer) {
             textContainer.innerHTML = (data.text_posts || [])
                 .map(post => `
@@ -95,34 +102,48 @@ fetch("/data/site.json")
                 .join("");
         }
 
+        /* VÍDEOS */
         if (videoContainer) {
             videoContainer.innerHTML = (data.videos || [])
                 .map(post => {
-                    const videoId = yt(post.youtube_url);
+                    const videoId = getYouTubeId(post.youtube_url);
                     const description = String(post.description ?? "");
+
                     const preview =
                         description.length > 180
-                            ? `${description.substring(0, 180)}...`
+                            ? description.substring(0, 180) + "..."
                             : description;
+
+                    const videoPlayer = videoId
+                        ? `
+                            "
+                                title="${esc(post.title)}"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                referrerpolicy="strict-origin-when-cross-origin"
+                                allowfullscreen>
+                            </iframe>
+                        `
+                        : `
+                            <div class="video-placeholder">
+                                Vídeo no disponible
+                            </div>
+                        `;
+
+                    const fullDescription = description.length > 180
+                        ? `
+                            <details>
+                                <summary>Ver descripción completa</summary>
+
+                                <div class="video-description">
+                                    <p>${formatText(description)}</p>
+                                </div>
+                            </details>
+                        `
+                        : "";
 
                     return `
                         <article class="card video">
-                            ${
-                                videoId
-                                    ? `
-                                        "
-                                            title="${esc(post.title)}"
-                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                            referrerpolicy="strict-origin-when-cross-origin"
-                                            allowfullscreen>
-                                        </iframe>
-                                    `
-                                    : `
-                                        <div class="video-placeholder">
-                                            Vídeo no disponible
-                                        </div>
-                                    `
-                            }
+                            ${videoPlayer}
 
                             <p class="date">${esc(post.date)}</p>
 
@@ -132,19 +153,7 @@ fetch("/data/site.json")
                                 <strong>${formatText(preview)}</strong>
                             </p>
 
-                            ${
-                                description.length > 180
-                                    ? `
-                                        <details>
-                                            <summary>Ver descripción completa</summary>
-
-                                            <div class="video-description">
-                                                <p>${formatText(description)}</p>
-                                            </div>
-                                        </details>
-                                    `
-                                    : ""
-                            }
+                            ${fullDescription}
                         </article>
                     `;
                 })
@@ -155,6 +164,7 @@ fetch("/data/site.json")
         console.error("Error cargando las publicaciones:", error);
     });
 
+/* FORMULARIO DE DESCARGA DEL CV */
 const cvForm = $("#cv-form");
 
 if (cvForm) {
@@ -199,12 +209,14 @@ if (cvForm) {
 
             downloadLink.href =
                 "/downloads/CV_Luis_Eduardo_Duran_Mora.pdf";
+
             downloadLink.download =
                 "CV_Luis_Eduardo_Duran_Mora.pdf";
 
             document.body.appendChild(downloadLink);
             downloadLink.click();
             downloadLink.remove();
+
         } catch (error) {
             console.error("Error enviando el formulario:", error);
 
@@ -220,6 +232,7 @@ if (cvForm) {
     });
 }
 
+/* NETLIFY IDENTITY */
 if (window.netlifyIdentity) {
     window.netlifyIdentity.on("init", user => {
         if (!user && location.hash.includes("invite_token")) {
