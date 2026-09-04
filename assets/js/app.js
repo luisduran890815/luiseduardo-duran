@@ -27,7 +27,11 @@ const getYouTubeId = (url) => {
       return parsedUrl.pathname.split('/').filter(Boolean)[0] || '';
     }
 
-    if (hostname === 'youtube.com' || hostname === 'm.youtube.com' || hostname === 'youtube-nocookie.com') {
+    if (
+      hostname === 'youtube.com' ||
+      hostname === 'm.youtube.com' ||
+      hostname === 'youtube-nocookie.com'
+    ) {
       const queryId = parsedUrl.searchParams.get('v');
       if (queryId) return queryId;
 
@@ -41,6 +45,33 @@ const getYouTubeId = (url) => {
   }
 };
 
+const normalisePhoto = (item, fallbackAlt) => {
+  if (typeof item === 'string') {
+    return { image: item, alt: fallbackAlt };
+  }
+
+  return {
+    image: item?.image || '',
+    alt: item?.alt || fallbackAlt
+  };
+};
+
+const getPostPhotos = (post) => {
+  const galleryPhotos = Array.isArray(post.images)
+    ? post.images
+        .map((item) => normalisePhoto(item, post.title))
+        .filter((item) => item.image)
+    : [];
+
+  if (galleryPhotos.length > 0) return galleryPhotos;
+
+  if (post.image) {
+    return [{ image: post.image, alt: post.title }];
+  }
+
+  return [];
+};
+
 fetch('/data/site.json')
   .then((response) => {
     if (!response.ok) throw new Error('No se pudo cargar /data/site.json');
@@ -52,18 +83,36 @@ fetch('/data/site.json')
     const videoContainer = $('#video-posts');
 
     if (photoContainer) {
-      photoContainer.innerHTML = (data.photo_posts || []).map((post) => `
-        <article class="card">
-          <img
-            loading="lazy"
-            src="${escapeHtml(post.image)}"
-            alt="${escapeHtml(post.title)}"
-          >
-          <p class="date">${escapeHtml(post.date)}</p>
-          <h3>${escapeHtml(post.title)}</h3>
-          <p>${formatText(post.caption)}</p>
-        </article>
-      `).join('');
+      photoContainer.innerHTML = (data.photo_posts || []).map((post, postIndex) => {
+        const photos = getPostPhotos(post);
+        const galleryClass = photos.length > 1 ? 'gallery gallery-multiple' : 'gallery gallery-single';
+
+        const gallery = photos.length > 0
+          ? `
+              <div class="${galleryClass}" data-gallery="${postIndex}">
+                ${photos.map((photo, photoIndex) => `
+                  <figure class="gallery-item">
+                    <img
+                      loading="lazy"
+                      src="${escapeHtml(photo.image)}"
+                      alt="${escapeHtml(photo.alt)}"
+                      data-photo-index="${photoIndex}"
+                    >
+                  </figure>
+                `).join('')}
+              </div>
+            `
+          : '<div class="photo-placeholder">Imagen no disponible</div>';
+
+        return `
+          <article class="card photo-post">
+            ${gallery}
+            <p class="date">${escapeHtml(post.date)}</p>
+            <h3>${escapeHtml(post.title)}</h3>
+            <p>${formatText(post.caption)}</p>
+          </article>
+        `;
+      }).join('');
     }
 
     if (textContainer) {
