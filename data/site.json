@@ -9,12 +9,6 @@
   ],
   "text_posts": [
     {
-      "title": "Bienvenido a mi blog",
-      "date": "2026-09-04",
-      "excerpt": "Un espacio para compartir ideas sobre infraestructura, mantenimiento, proyectos, tecnología y mejora continua.",
-      "body": "Aquí publicaré análisis, experiencias y aprendizajes que puedan aportar valor a profesionales y organizaciones."
-    },
-    {
       "title": "Lo que he aprendido gestionando infraestructura: la diferencia entre reparar problemas y construir continuidad",
       "date": "2026-09-04",
       "excerpt": "La experiencia me ha enseñado que el verdadero valor de la infraestructura no está en resolver emergencias, sino en construir organizaciones más resilientes, eficientes y preparadas para el futuro.",
