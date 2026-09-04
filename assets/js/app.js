@@ -46,14 +46,8 @@ const getYouTubeId = (url) => {
 };
 
 const normalisePhoto = (item, fallbackAlt) => {
-  if (typeof item === 'string') {
-    return { image: item, alt: fallbackAlt };
-  }
-
-  return {
-    image: item?.image || '',
-    alt: item?.alt || fallbackAlt
-  };
+  if (typeof item === 'string') return { image: item, alt: fallbackAlt };
+  return { image: item?.image || '', alt: item?.alt || fallbackAlt };
 };
 
 const getPostPhotos = (post) => {
@@ -64,12 +58,130 @@ const getPostPhotos = (post) => {
     : [];
 
   if (galleryPhotos.length > 0) return galleryPhotos;
+  if (post.image) return [{ image: post.image, alt: post.title }];
+  return [];
+};
 
-  if (post.image) {
-    return [{ image: post.image, alt: post.title }];
+const createPhotoCarousel = (photos, postIndex) => {
+  if (!photos.length) {
+    return '<div class="photo-placeholder">Imagen no disponible</div>';
   }
 
-  return [];
+  const slides = photos.map((photo, photoIndex) => `
+    <figure class="carousel-slide${photoIndex === 0 ? ' is-active' : ''}" data-slide="${photoIndex}">
+      <img
+        loading="lazy"
+        src="${escapeHtml(photo.image)}"
+        alt="${escapeHtml(photo.alt)}"
+      >
+    </figure>
+  `).join('');
+
+  const controls = photos.length > 1 ? `
+    <button class="carousel-button carousel-previous" type="button" aria-label="Ver foto anterior">&#10094;</button>
+    <button class="carousel-button carousel-next" type="button" aria-label="Ver foto siguiente">&#10095;</button>
+    <div class="carousel-counter" aria-live="polite">1 / ${photos.length}</div>
+    <div class="carousel-dots" aria-label="Seleccionar foto">
+      ${photos.map((photo, photoIndex) => `
+        <button
+          class="carousel-dot${photoIndex === 0 ? ' is-active' : ''}"
+          type="button"
+          data-go-to="${photoIndex}"
+          aria-label="Ver foto ${photoIndex + 1} de ${photos.length}"
+          aria-pressed="${photoIndex === 0 ? 'true' : 'false'}"
+        ></button>
+      `).join('')}
+    </div>
+  ` : '';
+
+  return `
+    <div class="photo-carousel" data-carousel="${postIndex}" data-current-slide="0">
+      <div class="carousel-viewport">
+        <div class="carousel-track">
+          ${slides}
+        </div>
+        ${controls}
+      </div>
+    </div>
+  `;
+};
+
+const createExpandableText = (text, className, label, limit = 220) => {
+  const content = String(text ?? '').trim();
+
+  if (!content) return '';
+
+  if (content.length <= limit) {
+    return `<p class="${className}">${formatText(content)}</p>`;
+  }
+
+  const preview = `${content.slice(0, limit).trim()}...`;
+
+  return `
+    <div class="expandable-text ${className}">
+      <p class="expandable-preview">${formatText(preview)}</p>
+      <details>
+        <summary>${label}</summary>
+        <div class="expandable-content">
+          <p>${formatText(content)}</p>
+        </div>
+      </details>
+    </div>
+  `;
+};
+
+const activateCarousels = () => {
+  document.querySelectorAll('.photo-carousel').forEach((carousel) => {
+    const track = carousel.querySelector('.carousel-track');
+    const slides = [...carousel.querySelectorAll('.carousel-slide')];
+    const dots = [...carousel.querySelectorAll('.carousel-dot')];
+    const previousButton = carousel.querySelector('.carousel-previous');
+    const nextButton = carousel.querySelector('.carousel-next');
+    const counter = carousel.querySelector('.carousel-counter');
+
+    if (!track || slides.length < 2) return;
+
+    let currentSlide = 0;
+    let touchStartX = 0;
+
+    const showSlide = (requestedIndex) => {
+      currentSlide = (requestedIndex + slides.length) % slides.length;
+      carousel.dataset.currentSlide = String(currentSlide);
+      track.style.transform = `translateX(-${currentSlide * 100}%)`;
+
+      slides.forEach((slide, index) => {
+        slide.classList.toggle('is-active', index === currentSlide);
+        slide.setAttribute('aria-hidden', index === currentSlide ? 'false' : 'true');
+      });
+
+      dots.forEach((dot, index) => {
+        const isActive = index === currentSlide;
+        dot.classList.toggle('is-active', isActive);
+        dot.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+      });
+
+      if (counter) counter.textContent = `${currentSlide + 1} / ${slides.length}`;
+    };
+
+    previousButton?.addEventListener('click', () => showSlide(currentSlide - 1));
+    nextButton?.addEventListener('click', () => showSlide(currentSlide + 1));
+
+    dots.forEach((dot) => {
+      dot.addEventListener('click', () => showSlide(Number(dot.dataset.goTo)));
+    });
+
+    track.addEventListener('touchstart', (event) => {
+      touchStartX = event.changedTouches[0].clientX;
+    }, { passive: true });
+
+    track.addEventListener('touchend', (event) => {
+      const touchDistance = event.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(touchDistance) < 45) return;
+      showSlide(touchDistance < 0 ? currentSlide + 1 : currentSlide - 1);
+    }, { passive: true });
+
+    showSlide(0);
+  });
 };
 
 fetch('/data/site.json')
@@ -85,34 +197,25 @@ fetch('/data/site.json')
     if (photoContainer) {
       photoContainer.innerHTML = (data.photo_posts || []).map((post, postIndex) => {
         const photos = getPostPhotos(post);
-        const galleryClass = photos.length > 1 ? 'gallery gallery-multiple' : 'gallery gallery-single';
-
-        const gallery = photos.length > 0
-          ? `
-              <div class="${galleryClass}" data-gallery="${postIndex}">
-                ${photos.map((photo, photoIndex) => `
-                  <figure class="gallery-item">
-                    <img
-                      loading="lazy"
-                      src="${escapeHtml(photo.image)}"
-                      alt="${escapeHtml(photo.alt)}"
-                      data-photo-index="${photoIndex}"
-                    >
-                  </figure>
-                `).join('')}
-              </div>
-            `
-          : '<div class="photo-placeholder">Imagen no disponible</div>';
+        const carousel = createPhotoCarousel(photos, postIndex);
+        const caption = createExpandableText(
+          post.caption,
+          'photo-caption',
+          'Ver descripción completa',
+          220
+        );
 
         return `
           <article class="card photo-post">
-            ${gallery}
+            ${carousel}
             <p class="date">${escapeHtml(post.date)}</p>
             <h3>${escapeHtml(post.title)}</h3>
-            <p>${formatText(post.caption)}</p>
+            ${caption}
           </article>
         `;
       }).join('');
+
+      activateCarousels();
     }
 
     if (textContainer) {
