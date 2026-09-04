@@ -1,10 +1,12 @@
 backend:
   name: git-gateway
   branch: main
+
 media_folder: "assets/img/uploads"
 public_folder: "/assets/img/uploads"
 publish_mode: simple
 locale: es
+
 collections:
   - name: "contenido"
     label: "Contenido del sitio"
@@ -14,27 +16,94 @@ collections:
         file: "data/site.json"
         format: "json"
         fields:
-          - label: "Publicaciones con foto"
+          - label: "Publicaciones con fotos"
             name: "photo_posts"
             widget: "list"
+            summary: "{{fields.title}} - {{fields.date}}"
             fields:
-              - {label: "Título", name: "title", widget: "string"}
-              - {label: "Fecha", name: "date", widget: "datetime", format: "YYYY-MM-DD", time_format: false}
-              - {label: "Foto", name: "image", widget: "image"}
-              - {label: "Texto debajo de la foto", name: "caption", widget: "text"}
+              - label: "Título"
+                name: "title"
+                widget: "string"
+
+              - label: "Fecha"
+                name: "date"
+                widget: "datetime"
+                format: "YYYY-MM-DD"
+                date_format: "DD/MM/YYYY"
+                time_format: false
+
+              - label: "Foto anterior"
+                name: "image"
+                widget: "image"
+                required: false
+                hint: "Campo compatible con publicaciones antiguas. Para publicaciones nuevas utiliza la galería de fotos."
+
+              - label: "Galería de fotos"
+                name: "images"
+                widget: "list"
+                required: false
+                min: 1
+                summary: "{{fields.image}}"
+                fields:
+                  - label: "Imagen"
+                    name: "image"
+                    widget: "image"
+
+                  - label: "Texto alternativo"
+                    name: "alt"
+                    widget: "string"
+                    required: false
+                    hint: "Describe brevemente la imagen para accesibilidad."
+
+              - label: "Texto debajo de la publicación"
+                name: "caption"
+                widget: "text"
+
           - label: "Escritos"
             name: "text_posts"
             widget: "list"
+            summary: "{{fields.title}} - {{fields.date}}"
             fields:
-              - {label: "Título", name: "title", widget: "string"}
-              - {label: "Fecha", name: "date", widget: "datetime", format: "YYYY-MM-DD", time_format: false}
-              - {label: "Resumen", name: "excerpt", widget: "text"}
-              - {label: "Texto", name: "body", widget: "text"}
+              - label: "Título"
+                name: "title"
+                widget: "string"
+
+              - label: "Fecha"
+                name: "date"
+                widget: "datetime"
+                format: "YYYY-MM-DD"
+                date_format: "DD/MM/YYYY"
+                time_format: false
+
+              - label: "Resumen"
+                name: "excerpt"
+                widget: "text"
+
+              - label: "Texto"
+                name: "body"
+                widget: "text"
+
           - label: "Vídeos"
             name: "videos"
             widget: "list"
+            summary: "{{fields.title}} - {{fields.date}}"
             fields:
-              - {label: "Título", name: "title", widget: "string"}
-              - {label: "Fecha", name: "date", widget: "datetime", format: "YYYY-MM-DD", time_format: false}
-              - {label: "URL de YouTube", name: "youtube_url", widget: "string", required: false}
-              - {label: "Descripción", name: "description", widget: "text"}
+              - label: "Título"
+                name: "title"
+                widget: "string"
+
+              - label: "Fecha"
+                name: "date"
+                widget: "datetime"
+                format: "YYYY-MM-DD"
+                date_format: "DD/MM/YYYY"
+                time_format: false
+
+              - label: "URL de YouTube"
+                name: "youtube_url"
+                widget: "string"
+                required: false
+
+              - label: "Descripción"
+                name: "description"
+                widget: "text"
