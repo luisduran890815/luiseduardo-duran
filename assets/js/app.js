@@ -342,30 +342,69 @@ if (cvForm) {
     const button = form.querySelector('button');
 
     if (button) button.disabled = true;
-    if (status) status.textContent = 'Registrando solicitud...';
+
+    if (status) {
+      status.textContent = 'Registrando solicitud...';
+    }
 
     try {
-      const body = new URLSearchParams(new FormData(form));
+      const formData = new FormData(form);
+
+      const nombre = formData.get('nombre') || '';
+      const cedula = formData.get('cedula') || '';
+      const celular = formData.get('celular') || '';
+      const email = formData.get('email') || '';
+      const empresa = formData.get('empresa') || '';
+      const cargo = formData.get('cargo') || '';
+      const motivo = formData.get('motivo') || '';
+
+      const body = new URLSearchParams(formData);
+
       const response = await fetch('/', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
         body: body.toString()
       });
 
-      if (!response.ok) throw new Error('No se pudo registrar la solicitud.');
+      if (!response.ok) {
+        throw new Error('No se pudo registrar la solicitud.');
+      }
 
-      if (status) status.textContent = 'Solicitud registrada. La descarga comenzará ahora.';
+      const mensaje = `Hola Luis.
+
+Quiero solicitar tu hoja de vida.
+
+Nombre: ${nombre}
+Cédula: ${cedula}
+Celular: ${celular}
+Correo: ${email}
+Empresa: ${empresa}
+Cargo: ${cargo}
+
+Motivo:
+${motivo}`;
+
+      const whatsappURL =
+        `https://wa.me/573116071310?text=${encodeURIComponent(mensaje)}`;
+
+      if (status) {
+        status.textContent =
+          'Solicitud registrada correctamente. Se abrirá WhatsApp para enviarte la información.';
+      }
+
+      window.open(whatsappURL, '_blank');
+
       form.reset();
 
-      const downloadLink = document.createElement('a');
-      downloadLink.href = '/downloads/CV_Luis_Eduardo_Duran_Mora.pdf';
-      downloadLink.download = 'CV_Luis_Eduardo_Duran_Mora.pdf';
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      downloadLink.remove();
     } catch (error) {
       console.error('Error enviando el formulario:', error);
-      if (status) status.textContent = 'No fue posible registrar la solicitud. Inténtalo nuevamente.';
+
+      if (status) {
+        status.textContent =
+          'No fue posible registrar la solicitud. Inténtalo nuevamente.';
+      }
     } finally {
       if (button) button.disabled = false;
     }
