@@ -184,6 +184,58 @@ const activateCarousels = () => {
   });
 };
 
+
+const INITIAL_VISIBLE_POSTS = 2;
+
+const setupExpandableSection = (container, sectionLabel) => {
+  if (!container) return;
+
+  const posts = [...container.querySelectorAll(':scope > article')];
+  const previousButton = container.querySelector(':scope > .posts-toggle-button');
+  if (previousButton) previousButton.remove();
+
+  posts.forEach((post, index) => {
+    post.hidden = index >= INITIAL_VISIBLE_POSTS;
+  });
+
+  if (posts.length <= INITIAL_VISIBLE_POSTS) return;
+
+  const hiddenCount = posts.length - INITIAL_VISIBLE_POSTS;
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'posts-toggle-button';
+  button.setAttribute('aria-expanded', 'false');
+  button.textContent = `Ver más ${sectionLabel} (${hiddenCount})`;
+
+  Object.assign(button.style, {
+    display: 'block',
+    width: 'fit-content',
+    maxWidth: '100%',
+    margin: '24px auto 8px',
+    padding: '12px 22px',
+    border: '0',
+    borderRadius: '999px',
+    background: '#173b63',
+    color: '#ffffff',
+    font: 'inherit',
+    fontWeight: '700',
+    cursor: 'pointer'
+  });
+
+  button.addEventListener('click', () => {
+    const expanded = button.getAttribute('aria-expanded') === 'true';
+    posts.slice(INITIAL_VISIBLE_POSTS).forEach((post) => {
+      post.hidden = !expanded;
+    });
+    button.setAttribute('aria-expanded', String(!expanded));
+    button.textContent = expanded
+      ? `Ver más ${sectionLabel} (${hiddenCount})`
+      : 'Ver menos';
+  });
+
+  container.appendChild(button);
+};
+
 fetch('/data/site.json')
   .then((response) => {
     if (!response.ok) throw new Error('No se pudo cargar /data/site.json');
@@ -216,6 +268,7 @@ fetch('/data/site.json')
       }).join('');
 
       activateCarousels();
+      setupExpandableSection(photoContainer, 'publicaciones');
     }
 
     if (textContainer) {
@@ -232,6 +285,7 @@ fetch('/data/site.json')
           </details>
         </article>
       `).join('');
+      setupExpandableSection(textContainer, 'artículos');
     }
 
     if (videoContainer) {
@@ -272,6 +326,7 @@ fetch('/data/site.json')
           </article>
         `;
       }).join('');
+      setupExpandableSection(videoContainer, 'vídeos');
     }
   })
   .catch((error) => console.error('Error cargando las publicaciones:', error));
