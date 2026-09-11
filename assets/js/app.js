@@ -184,7 +184,6 @@ const activateCarousels = () => {
   });
 };
 
-
 const INITIAL_VISIBLE_POSTS = 2;
 
 const setupExpandableSection = (container, sectionLabel) => {
