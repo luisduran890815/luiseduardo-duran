@@ -1,10 +1,18 @@
 {
   "photo_posts": [
     {
-      "image": "/assets/img/uploads/cambio-de-chiller-genoves.jpeg",
-      "title": "Adecuaciones previas Cambio de Chiller Genoves",
+      "image": "",
+      "title": "Renovación Integral del Sistema de Agua Helada y Continuidad Operacional",
       "date": "2026-08-31",
-      "caption": "Realizando adecuaciones de obra civil previas para poder extraer el chiller averiado."
+      "caption": "Como parte del plan de recuperación de capacidad frigorífica, se ejecutó el retiro controlado del chiller principal afectado por falla catastrófica del compresor ocasionada por comunicación interna de refrigerante y agua debido a rotura tubular en el intercambiador de calor. Con el acompañamiento técnico de DAIKIN, se implementó una solución temporal mediante chiller de alquiler para garantizar la continuidad operativa, mientras avanza la fabricación de la nueva unidad y la corrección de fugas en el chiller de respaldo para fortalecer la redundancia del sistema.",
+      "images": [
+        {
+          "image": "/assets/img/uploads/cambio-de-chiller-genoves.jpeg"
+        },
+        {
+          "image": "/assets/img/uploads/5001552879088766099.jpg"
+        }
+      ]
     },
     {
       "title": "De la ingeniería en papel a la experiencia del usuario: renovación del sistema HVAC en la IPS SURA Génoves",
