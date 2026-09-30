@@ -184,6 +184,13 @@ const activateCarousels = () => {
   });
 };
 
+const sortByDateDesc = (items = []) =>
+  [...items].sort((a, b) => {
+    const dateA = new Date(a?.date || 0).getTime();
+    const dateB = new Date(b?.date || 0).getTime();
+    return dateB - dateA;
+  });
+
 const INITIAL_VISIBLE_POSTS = 2;
 
 const setupExpandableSection = (container, sectionLabel) => {
@@ -246,7 +253,7 @@ fetch('/data/site.json')
     const videoContainer = $('#video-posts');
 
     if (photoContainer) {
-      photoContainer.innerHTML = (data.photo_posts || []).map((post, postIndex) => {
+      photoContainer.innerHTML = sortByDateDesc(data.photo_posts || []).map((post, postIndex) => {
         const photos = getPostPhotos(post);
         const carousel = createPhotoCarousel(photos, postIndex);
         const caption = createExpandableText(
@@ -271,7 +278,7 @@ fetch('/data/site.json')
     }
 
     if (textContainer) {
-      textContainer.innerHTML = (data.text_posts || []).map((post) => `
+      textContainer.innerHTML = sortByDateDesc(data.text_posts || []).map((post) => `
         <article class="card">
           <p class="date">${escapeHtml(post.date)}</p>
           <h3>${escapeHtml(post.title)}</h3>
@@ -288,7 +295,7 @@ fetch('/data/site.json')
     }
 
     if (videoContainer) {
-      videoContainer.innerHTML = (data.videos || []).map((post) => {
+      videoContainer.innerHTML = sortByDateDesc(data.videos || []).map((post) => {
         const videoId = getYouTubeId(post.youtube_url);
         const description = String(post.description ?? '');
         const preview = description.length > 180
