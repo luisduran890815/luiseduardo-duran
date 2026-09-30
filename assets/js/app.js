@@ -224,7 +224,7 @@ const setupExpandableSection = (container, sectionLabel) => {
   button.addEventListener('click', () => {
     const expanded = button.getAttribute('aria-expanded') === 'true';
     posts.slice(INITIAL_VISIBLE_POSTS).forEach((post) => {
-      post.hidden = !expanded;
+      post.hidden = expanded;
     });
     button.setAttribute('aria-expanded', String(!expanded));
     button.textContent = expanded
