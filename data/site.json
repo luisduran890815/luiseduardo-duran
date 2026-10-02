@@ -33,7 +33,21 @@
     {
       "caption": "Detrás de cada espacio de salud hay cientos de decisiones que pocas veces son visibles. Comparto algunas imágenes del proyecto de adecuación del área de rehabilitación del Portal del Genovés, donde logramos transformar 400 m² mediante mejoras estratégicas de infraestructura, equipamiento y experiencia de usuario, optimizando recursos y potenciando la prestación del servicio. Orgulloso de haber liderado este proyecto de principio a fin.",
       "title": "Transformando espacios para transformar la rehabilitación",
-      "date": "2026-09-30"
+      "date": "2026-09-30",
+      "images": [
+        {
+          "image": "/assets/img/uploads/img_8134.jpeg",
+          "alt": "Sala espera "
+        },
+        {
+          "image": "/assets/img/uploads/img_8135.jpeg",
+          "alt": "Área TRX"
+        },
+        {
+          "image": "/assets/img/uploads/img_8136.jpeg",
+          "alt": "Consultorios"
+        }
+      ]
     }
   ],
   "text_posts": [
